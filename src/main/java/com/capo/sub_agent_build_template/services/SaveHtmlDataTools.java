@@ -34,10 +34,11 @@ public class SaveHtmlDataTools {
 		this.objectMapper= objectMapper;
 	}
 	
-	@Tool(description = "Saves the extracted HTML template, structured data, and generated images for final processing")
+	@Tool(description = "Saves the extracted HTML template, structured data, structured publicity,  and generated images for final processing")
     public String saveHtmlDataTool(
     		@ToolParam(description = "The extracted raw HTML/CSS code") String html,
     		@ToolParam(description = "The extracted raw JSON data object as a string") String data,
+    		@ToolParam(description = "The extracted raw JSON publicity object as a string") String publicity,
     		@ToolParam(description = "JSON object mapping image keys to the reference keys returned by generateImageWithSse (e.g. {\"img1\": \"__IMG_KEY__:img_uuid\"}), or empty object if no images") String images) {
 		String id = ToolContextHolder.get();
 		if (id == null) {
@@ -47,6 +48,7 @@ public class SaveHtmlDataTools {
 		ImageRedisRequest payload = new ImageRedisRequest();
 		payload.setHtml(html);
 		payload.setData(data);
+		payload.setPublicity(publicity);
 		payload.setImages(resolveImageKeys(images));
         redisTemplate.opsForValue().set(id, payload, 5, TimeUnit.MINUTES);
         redisTemplate.convertAndSend(requestTopic.getTopic(), Map.of("id", id));
